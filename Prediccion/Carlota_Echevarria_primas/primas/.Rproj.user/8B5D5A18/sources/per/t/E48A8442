@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573637361639.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E48A8442",
+    "lastKnownWriteTime" : 32370094775795759,
+    "last_content_update" : 1573637361639,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "A292774",
+        "caption" : "oPrimas",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=oPrimas&cache_key=A292774",
+        "displayedObservations" : 36,
+        "environment" : "",
+        "expression" : "oPrimas",
+        "object" : "oPrimas",
+        "preview" : 0,
+        "totalObservations" : 36,
+        "variables" : 1
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

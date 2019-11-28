@@ -1,0 +1,91 @@
+---
+title: "Colgate VS Cresta"
+author: "Carlota Echevarria"
+date: "20/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Librerias
+```{r warning=FALSE, message=FALSE}
+library(openxlsx)
+library(skimr)
+library(fpp2)
+library(ggplot2)
+library(zoo)
+library(ggfortify)
+require(forecast)
+require(xts)
+```
+
+Datos
+```{r}
+data.original<-read.xlsx("data/data.xlsx") 
+skim(data.original)
+```
+
+Convertimos los datos en serie temporal, ya que esta compuesto por semanas (52 anuales)
+```{r}
+colgate <- ts(data.original$Colgate, start = 1958, frequency = 52)
+crest <- ts(data.original$Crest, start = 1958, frequency = 52)
+```
+
+Generamos una variable con crest y colgate
+```{r}
+mydata <- ts(data.original[,c(3,4)], start = 1958, frequency = 52)
+```
+
+Dibujamos la serie temporal
+```{r}
+autoplot(colgate, col="blue") +
+  ggtitle("Cuota de mercado Colgate") +
+  xlab("Semana") +
+  ylab("Cuota de mercado") + theme_bw()
+autoplot(crest, col = "red") +
+  ggtitle("Cuota mercado Crest") +
+  xlab("Semana") +
+  ylab("Cuota de mercado")+theme_bw()
+autoplot(mydata, facets = TRUE, xlab = "Fecha",ylab = "Colgate VS Cresta", main = "Cuota de mercado")+theme_bw()
+
+autoplot(mydata, facets = FALSE) +
+  ggtitle("Cuotas de mercado de Crest y Colgate") +
+  xlab("Tiempo") +
+  ylab("Cuota de mercado") +theme_bw()
+```
+
+
+
+```{r}
+ggseasonplot(colgate, month.labels = TRUE, month.labels.left = TRUE) +
+  ylab("Market Share") +
+  ggtitle("Seasonal plot: Colgate Market Share")
+
+ggseasonplot(crest, week.labels = TRUE, week.labels.left = TRUE) +
+  ylab("Market Share") +
+  ggtitle("Seasonal plot: Crest Market Share")
+```
+
+
+
+```{r}
+mydata.z<-as.zoo(mydata)
+
+plot(mydata.z, xlab = "Tiempo", main = "Colgate vs Crest")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

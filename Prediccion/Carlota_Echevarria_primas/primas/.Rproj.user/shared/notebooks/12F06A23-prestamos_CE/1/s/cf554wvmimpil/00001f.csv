@@ -1,0 +1,2 @@
+"0","plot(primasnovida_ts, xlab = ""Fecha"", ylab = ""Primas no vida"", main = ""Evolución"", col = ""blue"")"
+"0",""

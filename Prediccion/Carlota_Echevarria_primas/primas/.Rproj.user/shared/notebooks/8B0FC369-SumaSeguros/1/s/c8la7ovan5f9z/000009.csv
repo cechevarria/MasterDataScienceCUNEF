@@ -1,0 +1,4 @@
+"0",""
+"0","#El arima lo que me está generando es el modelo sin los residuos (en ACF y PACF) de manera "
+"0","#automática que estaba obteniendo al tranformar en logaritmo y al realizar la diferencia para "
+"0","#hacer estacionaria la serie."

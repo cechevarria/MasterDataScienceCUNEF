@@ -1,0 +1,5 @@
+"0","autoplot(zPrimasVida) + ggtitle(""Primas de vida trimestrales"")+xlab(""Trimestre"")+ylab(""Primas de vida"")
+autoplot(zPrimasNoVida) + ggtitle(""Primas de  no vida trimestrales"")+xlab(""Trimestre"")+ylab(""Primas de no vida"")
+"
+"0",""
+"0","ggfreqplot(as.ts(zPrimasVida),freq=4,nrow=1,facet.labeller=c(""1T"",""2T"",""3T"",""4T""))+ggtitle(""Primas de vida trimestrales"")"

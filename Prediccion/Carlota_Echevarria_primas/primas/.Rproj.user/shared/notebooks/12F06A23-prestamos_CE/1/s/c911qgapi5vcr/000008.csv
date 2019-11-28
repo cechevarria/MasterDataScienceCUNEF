@@ -1,0 +1,4 @@
+"0","xPrimasVida <-xts((Primas_mapfre$Primas_vida),order.by=as.Date(Primas_mapfre$Fecha,""%m/%d/%Y""),frequency=4)"
+"0","xPrimasVida <- to.quarterly(xPrimasVida)"
+"0","xPrimasNoVida <-xts((Primas_mapfre$Primas_no_vida),order.by=as.Date(Primas_mapfre$Fecha,""%m/%d/%Y""),frequency=4)"
+"0","xPrimasNoVida <- to.quarterly(xPrimasNoVida)"

@@ -1,0 +1,207 @@
+---
+title: "Pasta de dientes"
+author: "Carlota Echevarria"
+date: "20/11/2019"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Librerias
+```{r warning=FALSE, message=FALSE}
+library(openxlsx)
+library(skimr)
+library(fpp2)
+library(ggplot2)
+library(zoo)
+library(ggfortify)
+require(forecast)
+require(xts)
+library(readr)
+library(tidyverse)
+library(dplyr)
+library(tsoutliers)
+library(TSA)
+```
+
+
+```{r}
+datos<-read.xlsx("data/data.xlsx")
+datos$Date <- as.Date(paste(datos$Year, datos$Week, 1, sep = "-"), "%Y-%U-%u")
+
+```
+
+
+
+
+```{r}
+#dividimos la serie en 2 y conversion en datos
+
+xcolgate <- ts(datos$Colgate, start = 1958, frequency = 52)
+
+xcrest <- ts(datos$Crest, start = 1958, frequency = 52)
+
+#conversion de datos
+
+#Transformamos a zoo
+zcolgate<-as.zoo(xcolgate)
+zcrest<-as.zoo(xcrest)
+
+names(zcolgate)<-"Colgate"
+names(zcrest)<-"Crest"
+
+view(zcolgate)
+#Plot serie
+
+autoplot(zcolgate)+ggtitle("Cuota de mercado")+ xlab("Semanas") + ylab("Colgate")
+
+autoplot(zcrest)+ggtitle("Cuota de mercado")+ xlab("Semanas") + ylab("Crest")
+
+#Seleccion del numero de observaciones para comparar la prediccion
+#Eliminamos las semanas de 1963
+cOmit = 16
+
+#Dara Size
+nObsColgate=length(zcolgate)
+nObsCrest= length(zcrest)
+
+
+#Sub_sample: para hacer el forecast
+oColgate <- window(zcolgate,start=index(zcolgate[1]),end=index(zcolgate[nObsColgate-cOmit])) 
+
+oCrest <- window(zcrest,start=index(zcrest[1]),end=index(zcrest[nObsCrest-cOmit])) 
+
+View(oColgate)
+
+
+```
+
+
+
+
+#MODELO ARIMA
+
+```{r}
+
+#Diferencia para hacerlo estacionario en media para colgate
+ggtsdisplay(diff(zcolgate))
+```
+
+```{r}
+zcrest_log<-log(zcrest)
+```
+
+
+
+
+```{r}
+#Se ha aplicado para crest logaritmos y diferencia en media
+ggtsdisplay(diff(zcrest_log))
+```
+
+
+```{r}
+fit1<-auto.arima(oColgate, lambda = 0)
+summary(fit1)
+```
+
+
+
+
+
+
+
+```{r}
+fit2<-auto.arima(oCrest, lambda = "auto")
+summary(fit2)
+```
+
+```{r}
+#Residuos colgate
+ggtsdisplay(fit1$residuals)
+```
+
+```{r}
+#Residuos crest
+
+ggtsdisplay(fit2$residuals)
+```
+
+
+
+```{r}
+
+fColgate.arima<-forecast(fit1)
+
+
+df_new <- data.frame(value = as.vector(zcolgate), time = time(zcolgate)) 
+
+ggplot(df_new)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ geom_forecast(fColgate.arima,alpha=0.4)+xlab("Fecha")+ylab("Colgate")+ggtitle("ARIMA: Predicción Colgate") + theme_bw() 
+
+fColgate.arima
+```
+
+
+```{r}
+fCrest.arima<-forecast(fit2)
+
+
+df_new <- data.frame(value = as.vector(zcrest), time = time(zcrest)) 
+
+ggplot(df_new)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ geom_forecast(fCrest.arima,alpha=0.4)+xlab("Fecha")+ylab("Crest")+ggtitle("ARIMA: Predicción Crest") + theme_bw() 
+
+fCrest.arima
+```
+
+#OUTLIERS
+Los puntos rojos son los distintos cambios exogenos, en caso de no haberse producido un impulso la serie habria continuado como se representa en azul.
+
+En el caso de crest se produce un escalon, que genera un impulso negativo, recobrando la serie original, produciendose otro escalon, generando un impulso amortiguado creciente.
+```{r}
+colgate_outlier<-tso(xcolgate, types = c("TC","AO","LS","IO","SLS"))
+plot(colgate_outlier, main="Impulso Colgate")
+
+crest_outlier<-tso(xcrest, types = c("TC", "AO", "LS", "IO","SLS"))
+plot(crest_outlier, main="Impulso Crest")
+```
+
+#ARIMAX
+
+
+
+
+```{r}
+colgate.m1<-arimax(oColgate,order=c(0,1,1),method = "ML",
+               xtransf= data.frame(I135=1*(seq(oColgate)==135),
+               I135=1*(seq(oColgate)==135)),
+               transfer=list(c(2,0),c(0,0)))
+```
+
+
+```{r}
+colgate.m1
+colgate.m1$coef
+```
+
+```{r}
+crest.m1<-arimax(oCrest, order=c(0,1,1), method= "ML",
+xtransf= data.frame(I135=1*(seq(oCrest)==135),
+               I135=1*(seq(oCrest)==135)),
+transfer=list(c(2,0),c(0,0)))
+
+crest.m1
+crest.m1$coef
+
+```
+
+
+```{r}
+plot(crest.m1$coef[2:5], type = "h")
+plot(colgate.m1$coef[2:5],type="h")
+```
+
+

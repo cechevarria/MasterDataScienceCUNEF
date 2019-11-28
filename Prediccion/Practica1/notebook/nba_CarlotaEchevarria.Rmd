@@ -1,0 +1,264 @@
+---
+title: "NBA"
+author: "Carlota Echevarria"
+date: "10/10/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+PROYECTO NBA
+Cargamos todas las librerias necesarias para nuestra predicción
+
+```{r}
+library(readr)
+library(nortest)
+library(tidyverse)
+library(gvlma)
+library(car)
+library(MASS)
+library(boot)
+library(ISLR)
+library(psych)
+library(leaps)
+library(fBasics)
+```
+Cargamos la base de datos
+
+```{r}
+nba <- read_csv("C:/Users/echev/Desktop/CUNEF/PREDICCIÓN/nba.csv")
+View(nba)
+```
+
+Eliminamos todos aquellas celdas que puedan contener NA, en este caso pasamos de 485 observaciones a 483
+
+```{r}
+nba<-na.omit(nba)
+```
+Procedemos a renombrar algunas variables
+```{r}
+nba<-rename(nba,"Salario"="Salary","Partidos"="G", "Minutos"="MP", "EficienciaPER"="PER", 
+            "Acierto_Tiro"="TS%", "Intento_Triple"="3PAr", "Tiros_Libres"="FTr", "Rebotes_Of"="ORB%", 
+            "Rebotes_Def"="DRB%", "Total_Rebotes"="TRB%",  "Asistencia"="AST%", "Robo"="STL%" , "Bloqueo"="BLK%", 
+            "Perdida_Balon"="TOV%", "Jugadasenequipo"="USG%","Victoria_Of"="OWS", "Victorias_Def"="DWS",
+            "Victorias"="WS","PtosOfensivosVSMedia"="OBPM", "PtosDefVSMedia"="DBPM", "PuntosVSMedia"="BPM", 
+    "JugadoresSimilares"="VORP")
+```
+Comenzare realizando una regresión lineal con todas las variables, salvo el nombre del jugador, 
+el equipo al que pertenece, y el país, ya que esto no debería de ser influyente a la hora de decidir 
+cuanto se le debe de pagar a un jugador.
+Adicionalmente a priori se observa que hay variables que son dependientes las unas de las otras, 
+como es el caso de los rebotes, tenemos por un lado rebotes ofensivos, por otro rebotes defensivos y el total,
+el total es dependiente de estas dos. 
+```{r}
+rlineal<-lm(Salario~NBA_DraftNumber+Age+Partidos+Minutos+EficienciaPER+Acierto_Tiro+Intento_Triple+Tiros_Libres+
+              Rebotes_Of+Rebotes_Def+Total_Rebotes+Asistencia+Robo+Bloqueo+Perdida_Balon+Jugadasenequipo+Victoria_Of+
+              Victorias_Def+Victorias+PtosOfensivosVSMedia+PtosDefVSMedia+PuntosVSMedia+JugadoresSimilares,data=nba)
+summary(rlineal)
+```
+Con estos primeros resultados, vemos como muchas variables no son significativas en el modelo.
+Utilizaremos el Modelo Backward Stepwise, que en cada etapa, la variable que menos mejora adicional aporta al modelo, es excluida.
+```{r}
+stepAIC(rlineal, direction="backward")
+```
+El modelo que obtenemos por el metodo Backward es el siguiente: lm(formula = Salario ~ NBA_DraftNumber + Age + Partidos + Minutos + 
+    EficienciaPER + Intento_Triple + Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+
+Adicionalmente podríamos realizar tambien el Modelo Forward Stepwise, que comienza con un modelo que no incluye níngun regresor 
+y va añadiendo variables de uno en uno, en cada etapa la variable que más mejora adicioanl aporta al modelo es incluida.
+Y se pueden combinar ambos.
+
+
+```{r}
+fwd<- regsubsets(Salario~.-(Player + Tm + NBA_Country), nba, method ="forward")
+summary (fwd)
+```
+Combinamos ambos métodos:
+
+```{r}
+stepAIC(rlineal, direction="both")
+```
+
+Combinando ambos el resultado es lm(formula = Salario ~ NBA_DraftNumber + Age + Partidos + Minutos + 
+    EficienciaPER + Intento_Triple + Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+Es decir el mismo resultado que cuando utilizamos el método Backward.
+Por lo tanto utilizaremos ahora este modelo.
+
+```{r}
+rlineal2<-lm(Salario~ NBA_DraftNumber + Age + Partidos + Minutos + EficienciaPER + 
+               Intento_Triple + Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+summary(rlineal2)
+```
+Con esta nueva regresión, hemos ganado significatividad para las variables. Aunque debido al 
+tipo de variables, podemos observar que existe dependencia, por ejemplo, 
+estan incluidas en nuestra regresión tanto el total de Rebotes, como los Rebotes ofensivos, 
+es decir son dependientes. A continuación vamos a estudiar la multicolinealidad de las variables.
+Para detectar la multicolinealidad se utiliza el factor de Inflación de varianza, para cualquier 
+regresor la raíz del VIF indica cuantas veces es la varianza del estimador es mayor que la 
+que se obtendria si no hubiera correlación entre los regresores, en este caso existe mucha correlación
+```{r}
+vif(rlineal2)
+sqrt(vif(rlineal2))>2
+```
+Según los resultados obtenidos, presentan dependencia las variables:Partidos, Minutos, 
+EficienciaPER,Total_Rebotes,PuntosOfensivosVSMedia
+Vamos a realizar dos estimaciones comparando incluir la variable "minutos" o "partidos"
+
+```{r}
+rlineal2.1<-lm(Salario~ NBA_DraftNumber + Age + Partidos + EficienciaPER + Intento_Triple 
+               + Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+summary(rlineal2.1)
+
+```
+Ahora quitando partidos
+
+```{r}
+rlineal2.2<-lm(Salario~ NBA_DraftNumber + Age + Minutos + EficienciaPER + Intento_Triple + 
+                 Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+summary(rlineal2.2)
+```
+Según los resultados, el RSE es menor cuando dejamos la variable partido, ademas las variables 
+son más significativas por lo tanto continuaremos con el modelo: rlineal2.1. 
+Volvemos a estudiar la multicolinealidad de este modelo:
+
+```{r}
+vif(rlineal2.1)
+sqrt(vif(rlineal2.1))>2
+```
+Sigue existiendo multicolinealidad en las variabes EficienciaPER, Total_Rebotes, y PtosOfensivosVSMedia, 
+pero demomento no las voy a eliminar del modelo.
+A continuación realizaremos gráficos:
+
+```{r}
+qqPlot(rlineal2.1, labels=row.names(nba), id.method="identify",
+      simulate=TRUE, main="Q-Q Plot")
+```
+```{r}
+influencePlot(rlineal2.1, id.method="identify", main="Influence Plot", 
+              sub="Circle size is proportial to Cook's Distance" )
+```
+
+Con estos gráficos vemos que las filas 112 y 326 empeoran la predicción, las eliminamos de la base de datos
+```{r}
+nba <- nba[c(-326,-112),]
+```
+
+```{r}
+qqPlot(rlineal2.1, labels=row.names(nba), id.method="identify",
+      simulate=TRUE, main="Q-Q Plot")
+```
+```{r}
+nba <- nba[c(-424,-151),]
+```
+```{r}
+qqPlot(rlineal2.1, labels=row.names(nba), id.method="identify",
+      simulate=TRUE, main="Q-Q Plot")
+```
+```{r}
+nba <- nba[c(-225,-130),]
+```
+```{r}
+qqPlot(rlineal2.1, labels=row.names(nba), id.method="identify",
+      simulate=TRUE, main="Q-Q Plot")
+```
+```{r}
+nba <- nba[c(-444,-464),]
+```
+```{r}
+qqPlot(rlineal2.1, labels=row.names(nba), id.method="identify",
+      simulate=TRUE, main="Q-Q Plot")
+```
+Observamos que por lo tanto hay muchas filas de nuestra base de datos que no 
+siguen una distribución normal, con el siguiente grafico veremos aquellas filas que 
+no favorecen a la predicción.
+
+```{r}
+cutoff <- 4/(nrow(nba)-length(rlineal2.1$coefficients)-2)
+plot(rlineal2.1, which=4, cook.levels=cutoff)
+```
+
+```{r}
+nba<-nba[c(-20,-226,-183),]
+```
+
+A continuación realizaremos el contraste de Jarque Bera, para comprobar si se trata de una distribución normal,
+cuya hipotesis nula se basa en que la distribución es normal.
+Pvalor es menor que alpha por lo tanto se rechaza la hipotesis nula, no se trata de una distribución normal.
+
+```{r}
+vresid<-resid(rlineal2.1) 
+jbTest(vresid)
+```
+Shapiro-Test, donde el pvalor es menor que alpha, y concluimos que la muestra no ha sido generada por una distribución normal
+```{r}
+shapiro.test(vresid)
+```
+A continuación estudiaremos la linealidad de las variables:
+```{r}
+crPlots(rlineal2.1)
+```
+Según los resultados, la variable EficienciaPER, no es nada lineal, vamos a realizar 
+una comparación de dos modelos sin esta, para comprobar cual seria mejor.
+
+```{r}
+rlineal2.1<-lm(Salario~ NBA_DraftNumber + Age + Partidos + EficienciaPER + Intento_Triple + 
+                 Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+summary(rlineal2.1)
+```
+
+```{r}
+rlineal2.1.1<-lm(Salario~ NBA_DraftNumber + Age + Partidos + Intento_Triple + Rebotes_Of + Total_Rebotes + 
+    Jugadasenequipo + Victorias + PtosOfensivosVSMedia, data = nba)
+summary(rlineal2.1.1)
+```
+
+
+```{r}
+AIC(rlineal2.1,rlineal2.1.1)
+BIC(rlineal2.1, rlineal2.1.1)
+
+```
+Nos quedaremos con el modelo rlineal2.1
+A continuación realizaremos la validación global, para saber si nuestro modelo cumple las condiciones
+
+```{r}
+library(gvlma)
+gvrlineal <- gvlma(rlineal2.1) 
+summary(gvrlineal)
+gvlma(x = rlineal2.1)
+```
+A continuación analizaremos el error del modelo
+```{r}
+set.seed(250)
+nba_num2<-nrow(nba) 
+aleatorio2<-sample(nba_num2 ,nba_num2/2)
+
+regres.aleatorio2<-lm(Salario ~ (NBA_DraftNumber + Age + Partidos + EficienciaPER + 
+Intento_Triple + Rebotes_Of + Total_Rebotes + Jugadasenequipo + Victorias + PtosOfensivosVSMedia), 
+nba, subset=aleatorio2)
+attach(nba) 
+
+mean((Salario-predict(regres.aleatorio2, Auto))[-aleatorio2 ]^2)
+
+sqrt(mean((Salario-predict(regres.aleatorio2, Auto))[-aleatorio2 ]^2))
+```
+El error es 5141893, es decir un erroe muy elevado para poder realizar una predicción, 
+a continuación realizaremos un ejemplo de un jugador al azar:
+
+```{r}
+predict.lm(rlineal2.1, data.frame(NBA_DraftNumber=10, Age = 20, Partidos=62, EficienciaPER=8.2,
+          Intento_Triple= 0.387, Rebotes_Of= 4.9, Total_Rebotes= 11.7, Jugadasenequipo=15.5, Victorias=0.8 , 
+          PtosOfensivosVSMedia=-3.7 ))
+```
+Hemos predecido el salario de Zach Collins, y hay una diferencia de casi 1.500.000$
+Es decir el salario obtenido con la predicción es inferior a la realidad.
+
+
+
+

@@ -1,0 +1,3 @@
+"0","#Transform to zoo data (forecast package)"
+"0","zPrimas = as.zoo(xPrimas$xPrimas.Close)"
+"0","names(zPrimas)=""Primas"""

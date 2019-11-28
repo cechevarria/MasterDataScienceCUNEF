@@ -1,0 +1,2 @@
+"0","fprimasvida.arima=forecast(modelo1ArimaNoVida)"
+"0","fprimasNovida.arima=forecast(modelo1ArimaVida)"

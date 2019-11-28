@@ -1,0 +1,254 @@
+---
+title: "Primas de Seguros"
+author: "Carlota Echevarria"
+date: "12/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=FALSE, message=FALSE}
+#Librerias
+require(forecast)
+require(xts) #Tiene coredata e index (Instante de tiempo por fila)
+require(ggplot2)
+library(ggfortify) #Plot Monthplot
+library(dplyr)
+
+```
+
+Lectura de datos
+```{r}
+library(readr)
+Primas_mapfre <- read.csv("data/Primas_mapfre.csv", header = TRUE,
+    sep = ";", dec = "," )
+View(Primas_mapfre)
+```
+
+```{r}
+primas_vida_<-select(Primas_mapfre,Fecha,Primas_vida)
+primas_novida_<-select(Primas_mapfre,Fecha,Primas_no_vida)
+```
+
+Queremos las primas totales: primas de vida y primas de no vida. Estimar 
+
+
+#Gráficos exploratorios
+```{r}
+primasvida_ts<-ts(primas_vida_$Primas_vida, start = c(2008,1), frequency = 4)
+primasnovida_ts<-ts(primas_novida_$Primas_no_vida, start = c(2008,1), frequency = 4)
+plot(primasvida_ts, xlab = "Fecha", ylab = "Primas de vida", main = "Evolución", col = "red")
+plot(primasnovida_ts, xlab = "Fecha", ylab = "Primas no vida", main = "Evolución", col = "blue")
+
+```
+
+```{r}
+primasvida_desc <- decompose(primasvida_ts)
+primasnovida_desc<-decompose(primasnovida_ts)
+plot(primasvida_desc, xlab = "Año", col= "red")
+plot(primasnovida_desc, xlab = "Año", col= "blue")
+```
+
+#Comenzamos ETS
+```{r}
+xPrimasVida <-xts((Primas_mapfre$Primas_vida),order.by=as.Date(Primas_mapfre$Fecha,"%m/%d/%Y"),frequency=4)
+xPrimasVida <- to.quarterly(xPrimasVida)
+xPrimasNoVida <-xts((Primas_mapfre$Primas_no_vida),order.by=as.Date(Primas_mapfre$Fecha,"%m/%d/%Y"),frequency=4)
+xPrimasNoVida <- to.quarterly(xPrimasNoVida)
+```
+
+
+```{r}
+zPrimasVida <-as.zoo(xPrimasVida$xPrimasVida.Close)
+zPrimasNoVida <-as.zoo(xPrimasNoVida$xPrimasNoVida.Close)
+names(zPrimasVida)<- "Primas de vida"
+names(zPrimasNoVida)<- "Primas de no vida"
+
+autoplot(zPrimasVida) + ggtitle("Primas de vida trimestrales")+xlab("Trimestre")+ylab("Primas de vida")
+autoplot(zPrimasNoVida) + ggtitle("Primas de  no vida trimestrales")+xlab("Trimestre")+ylab("Primas de no vida")
+
+ggfreqplot(as.ts(zPrimasVida),freq=4,nrow=1,facet.labeller=c("1T","2T","3T","4T"))+ggtitle("Primas de vida trimestrales")
+
+ggfreqplot(as.ts(zPrimasNoVida),freq=4,nrow=1,facet.labeller=c("1T","2T","3T","4T"))+ggtitle("Primas de no vida trimestrales")
+
+```
+Las primas de vida, a mediados del segundo, tercer y cuarto trimestre, el número de seguros cae. 
+
+Las primas de no vida, a mediados del segundo y tercer cuatrimestre se reduce.
+#Seleccion numero de observaciones
+
+```{r}
+cOmit = 4
+nObsVida = length(zPrimasVida)
+nObsNoVida = length(zPrimasNoVida)
+
+oVida <-window(zPrimasVida, start = index(zPrimasVida[1]), end = index(zPrimasVida[nObsVida - cOmit]))
+oNoVida <-window(zPrimasNoVida, start = index(zPrimasNoVida[1]), end = index(zPrimasNoVida[nObsNoVida - cOmit]))
+```
+
+#Predicción primas de vida
+```{r}
+modeloEtsvida<- ets(oVida, damped = TRUE)
+
+fVidaEts <- forecast(modeloEtsvida)
+
+summary(fVidaEts)
+```
+#Predicción primas de no vida
+
+```{r}
+modeloEtsNovida<-ets(oNoVida, damped = TRUE)
+
+fVidaNoEts <- forecast(modeloEtsNovida)
+
+summary(fVidaNoEts)
+```
+
+
+ETS -> Error / Trend/ Seasonal
+
+A: Aditivo
+Ad: Aditivo dumped
+N: None
+
+
+#Predicción primas de vida, la primera columna es la media y la segunda la prediccion. 
+```{r}
+matrizVida<-matrix(c(fVidaEts$mean[1:cOmit],zPrimasVida[(nObsVida-cOmit+1):nObsVida]),ncol=2)
+```
+
+```{r}
+matrizNoVida<-matrix(c(fVidaNoEts$mean[1:cOmit],zPrimasNoVida[(nObsNoVida-cOmit+1):nObsNoVida]),ncol=2)
+```
+
+Obtenemos en la primera columna la media de los valores que se han obtenido mediante ETS y en la segunda el valor predictivo.
+```{r}
+SumaTotal<-matrizVida + matrizNoVida
+SumaTotal
+```
+
+
+```{r}
+plot(fVidaEts)
+lines(window(zPrimasVida),type="o")
+lines(fVidaEts$mean,col="red")
+
+plot(fVidaNoEts)
+lines(window(zPrimasNoVida),type="o")
+lines(fVidaNoEts$mean,col="red")
+```
+
+
+#MODELO ARIMA
+Nuestra variable no es estacionaria en varianza, por lo que procedemos a realizar una transformación logaritmica
+
+```{r}
+zlPrimasVida=log(zPrimasVida)
+df_newlVida <- data.frame(value = as.vector(zlPrimasVida),
+                     time = time(zlPrimasVida))
+ggplot(df_newlVida)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ylab("Ventas")+ggtitle("Ventas Trimestrales de Primas de Vida")+xlab("Trimestres")
+
+zlPrimasNoVida=log(zPrimasNoVida)
+df_newlNoVida <- data.frame(value = as.vector(zlPrimasNoVida),
+                     time = time(zlPrimasNoVida))
+ggplot(df_newlNoVida)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ylab("Ventas")+ggtitle("Ventas Trimestrales de Primas de No Vida")+xlab("Trimestres")
+
+```
+
+Pasamos a convertir la serie en estacionaria en media, realizando una tasa de variación logaritmica. Adicionalmente se observa que pude existir un componente estacional.
+
+
+Representamos el logaritmo
+```{r}
+ggtsdisplay(zlPrimasVida)
+ggtsdisplay(zlPrimasNoVida)
+```
+
+
+diflogaritmo<-
+
+```{r}
+ggtsdisplay(diff(zlPrimasVida))
+ggtsdisplay(diff(zlPrimasNoVida))
+
+
+```
+
+
+```{r}
+modelo1ArimaVida <-auto.arima(oVida, lambda = 0)
+summary(modelo1ArimaVida)
+
+```
+
+
+```{r}
+modelo1ArimaNoVida<-auto.arima(oNoVida, lambda = 0)
+summary(modelo1ArimaNovida)
+```
+
+
+```{r}
+ggtsdisplay(modelo1ArimaVida$residuals)
+```
+
+```{r}
+ggtsdisplay(modelo1ArimaNoVida$residuals)
+```
+
+```{r}
+Box.test(modelo1ArimaVida$residuals,lag=4, fitdf=3, type="Lj")
+Box.test(modelo1ArimaVida$residuals,lag=8, fitdf=3, type="Lj")
+Box.test(modelo1ArimaVida$residuals,lag=12, fitdf=3, type="Lj")
+Box.test(modelo1ArimaVida$residuals,lag=24, fitdf=3, type="Lj")
+```
+
+L hipotesis nula de Ljung-Box prueba que las autocorrelaciones de hasta un retardo k son iguales a cero, es decir los valores de los datos son aleatorios e independites hasta un cierto número de retardos, probamos con 4,8,12 y 24
+
+```{r}
+Box.test(modelo1ArimaNoVida$residuals,lag=4, fitdf=3, type="Lj")
+Box.test(modelo1ArimaNoVida$residuals,lag=8, fitdf=3, type="Lj")
+Box.test(modelo1ArimaNoVida$residuals,lag=12, fitdf=3, type="Lj")
+Box.test(modelo1ArimaNoVida$residuals,lag=24, fitdf=3, type="Lj")
+```
+Se acepta la hipotesis nula puesto que el pvalor es mayor que 0,05 (nivel de significación)
+
+```{r}
+fprimasvida.arima=forecast(modelo1ArimaNoVida)
+fprimasNovida.arima=forecast(modelo1ArimaVida)
+```
+
+
+```{r}
+df_newVida<-data.frame(value=as.vector(zPrimasVida), time = time(zPrimasVida))
+
+ggplot(df_newVida)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+geom_forecast(fprimasvida.arima,alpha=0.4)+ggtitle("Ventas Trimestrales de Primas de Vida")
+
+
+fprimasvida.arima
+
+
+df_newNoVida<-data.frame(value=as.vector(zPrimasNoVida), time = time(zPrimasNoVida))
+
+ggplot(df_newNoVida)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+geom_forecast(fprimasNovida.arima,alpha=0.4)+ggtitle("Ventas Trimestrales de Primas de  No Vida")
+
+
+fprimasNovida.arima
+
+```
+
+
+```{r}
+df_new <- data.frame(value = as.vector(zPrimas),
+                     time = time(zPrimas))
+
+ggplot(df_new)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ geom_forecast(fprimas.arima,alpha=0.4)+xlab("Fecha")+ylab("Primas")+ggtitle("ARIMA: Predicción Primas") + theme_bw()
+
+
+fprimas.arima
+```
+
+
+

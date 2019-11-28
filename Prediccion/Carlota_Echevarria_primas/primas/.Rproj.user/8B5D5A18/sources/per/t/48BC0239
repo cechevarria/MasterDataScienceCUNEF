@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573579403285.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "48BC0239",
+    "lastKnownWriteTime" : 27584981516943471,
+    "last_content_update" : 1573579403285,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "70BD11BD",
+        "caption" : "xPrimasVida",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=xPrimasVida&cache_key=70BD11BD",
+        "displayedObservations" : "40",
+        "environment" : "",
+        "expression" : "xPrimasVida",
+        "object" : "xPrimasVida",
+        "preview" : "0",
+        "totalObservations" : "40",
+        "variables" : "4"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

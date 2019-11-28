@@ -1,0 +1,3 @@
+"0","primasvida_desc <- decompose(primasvida_ts)"
+"0","primasnovida_desc<-decompose(primasnovida_ts)"
+"0","plot(primasvida_desc, xlab = ""Año"", col= ""red"")"

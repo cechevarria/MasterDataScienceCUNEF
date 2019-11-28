@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573578537083.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "1DA6362B",
+    "lastKnownWriteTime" : 1573565163,
+    "last_content_update" : 1573578537083,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "7A69CFB",
+        "caption" : "primas_novida_",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=primas_novida_&cache_key=7A69CFB",
+        "displayedObservations" : 40,
+        "environment" : "",
+        "expression" : "primas_novida_",
+        "object" : "primas_novida_",
+        "preview" : 0,
+        "totalObservations" : 40,
+        "variables" : 2
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

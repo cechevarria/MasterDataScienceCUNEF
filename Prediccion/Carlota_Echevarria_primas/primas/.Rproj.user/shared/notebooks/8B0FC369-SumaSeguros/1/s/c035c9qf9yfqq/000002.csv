@@ -1,0 +1,2 @@
+"0","##Plot Serie"
+"0","autoplot(zPrimas)+ggtitle(""Primas trimestrales"")+xlab(""Trimestres"")+ylab(""Primas"")"

@@ -1,0 +1,1 @@
+"0","matrizVida<-matrix(c(fVidaEts$mean[1:cOmit],zPrimasVida[(nObsVida-cOmit+1):nObsVida]),ncol=2)"

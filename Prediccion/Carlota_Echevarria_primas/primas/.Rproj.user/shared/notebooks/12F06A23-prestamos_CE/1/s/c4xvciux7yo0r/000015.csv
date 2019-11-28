@@ -1,0 +1,4 @@
+"0","zlPrimasVida=log(zPrimasVida)"
+"0","df_newlVida <- data.frame(value = as.vector(zlPrimasVida),"
+"0","                     time = time(zlPrimasVida))"
+"0","ggplot(df_newlVida)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ylab(""Ventas"")+ggtitle(""Ventas Trimestrales de Primas de Vida"")+xlab(""Trimestres"")"

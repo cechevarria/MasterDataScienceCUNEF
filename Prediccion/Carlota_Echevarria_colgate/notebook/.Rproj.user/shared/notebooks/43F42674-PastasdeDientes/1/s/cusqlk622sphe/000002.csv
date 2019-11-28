@@ -1,0 +1,3 @@
+"0","datos<-read.xlsx(""data/data.xlsx"")"
+"0","datos$Date <- as.Date(paste(datos$Year, datos$Week, 1, sep = ""-""), ""%Y-%U-%u"")"
+"0",""

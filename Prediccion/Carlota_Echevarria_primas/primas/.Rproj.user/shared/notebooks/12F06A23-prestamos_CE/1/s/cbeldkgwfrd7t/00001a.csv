@@ -1,0 +1,87 @@
+"0","modeloEtsNovida<-ets(oNoVida, damped = TRUE)
+
+fVidaNoEts <- forecast(modeloEtsNovida)
+
+summary(fVidaNoEts)
+"
+"1","
+Forecast method: ETS(A,Ad,A)"
+"1","
+
+Model Information:
+"
+"1","ETS(A,Ad,A) 
+
+"
+"1","Call:
+ ets(y = oNoVida, damped = TRUE) 
+
+"
+"1","  Smoothing parameters:
+"
+"1","    alpha = 1e-04 
+"
+"1","    beta  = 1e-04 
+"
+"1","    gamma = 1e-04 
+"
+"1","    phi   = 0.9528 
+"
+"1","
+  Initial states:
+"
+"1","    l = 2198.3617 
+"
+"1","    b = 139.3579 
+"
+"1","    s = "
+"1","-177.7518"
+"1"," "
+"1","-262.1253"
+"1"," "
+"1","-31.6318"
+"1"," "
+"1","471.5088"
+"1","
+"
+"1","
+  sigma:  "
+"1","281.2049"
+"1","
+
+"
+"1","     AIC "
+"1","    AICc "
+"1","     BIC "
+"1","
+"
+"1","544.6642 "
+"1","553.4642 "
+"1","560.4993 "
+"1","
+"
+"1","
+Error measures:
+"
+"1","            "
+"1","        ME"
+"1","     RMSE"
+"1","      MAE"
+"1","        MPE"
+"1","     MAPE"
+"1","      MASE"
+"1","       ACF1"
+"1","
+Training set"
+"1"," -2.874209"
+"1"," 243.5306"
+"1"," 177.8518"
+"1"," -0.8179414"
+"1"," 5.275064"
+"1"," 0.5325852"
+"1"," 0.08366937"
+"1","
+"
+"1","
+Forecasts:
+"

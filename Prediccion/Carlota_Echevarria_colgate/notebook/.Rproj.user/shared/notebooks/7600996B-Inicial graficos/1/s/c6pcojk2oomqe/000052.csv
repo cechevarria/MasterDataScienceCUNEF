@@ -1,0 +1,4 @@
+"0","autoplot(crest, col = ""red"") +"
+"0","  ggtitle(""Cuota mercado Crest"") +"
+"0","  xlab(""Semana"") +"
+"0","  ylab(""Cuota de mercado"")+theme_bw()"

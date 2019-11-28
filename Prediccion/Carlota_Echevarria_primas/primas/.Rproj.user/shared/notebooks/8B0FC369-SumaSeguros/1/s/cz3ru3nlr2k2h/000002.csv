@@ -1,0 +1,6 @@
+"0","#Log transformation"
+"0",""
+"0","zPrimas_log = log(zPrimas)"
+"0","df_newl <- data.frame(value = as.vector(zPrimas_log),"
+"0","                     time = time(zPrimas_log))"
+"0","ggplot(df_newl)+geom_point(aes(x=time,y=value))+geom_line(aes(x=time,y=value))+ylab(""Primas"")+ggtitle(""Modelo ARIMA"")+xlab(""Años"")"

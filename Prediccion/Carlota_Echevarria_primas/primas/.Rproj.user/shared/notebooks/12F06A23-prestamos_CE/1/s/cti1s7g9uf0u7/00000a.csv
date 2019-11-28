@@ -1,0 +1,75 @@
+"0","modeloEtsvida<- ets(oVida, damped = TRUE)
+
+fVidaEts <- forecast(modeloEtsvida)
+
+summary(fVidaEts)
+"
+"1","
+Forecast method: ETS(M,Ad,N)"
+"1","
+
+Model Information:
+"
+"1","ETS(M,Ad,N) 
+
+"
+"1","Call:
+ ets(y = oVida, damped = TRUE) 
+
+"
+"1","  Smoothing parameters:
+"
+"1","    alpha = 1e-04 
+"
+"1","    beta  = 1e-04 
+"
+"1","    phi   = 0.9508 
+"
+"1","
+  Initial states:
+"
+"1","    l = 688.9019 
+"
+"1","    b = 41.7531 
+"
+"1","
+  sigma:  "
+"1","0.2101"
+"1","
+
+"
+"1","     AIC "
+"1","    AICc "
+"1","     BIC "
+"1","
+"
+"1","528.6050 "
+"1","531.5015 "
+"1","538.1061 "
+"1","
+"
+"1","
+Error measures:
+"
+"1","            "
+"1","       ME"
+"1","     RMSE"
+"1","      MAE"
+"1","       MPE"
+"1","     MAPE"
+"1","     MASE"
+"1","        ACF1"
+"1","
+Training set"
+"1"," 14.26445"
+"1"," 224.3412"
+"1"," 193.4167"
+"1"," -2.079018"
+"1"," 16.99234"
+"1"," 1.019828"
+"1"," -0.01419642"
+"1","
+"
+"1","
+Forecasts:
+"

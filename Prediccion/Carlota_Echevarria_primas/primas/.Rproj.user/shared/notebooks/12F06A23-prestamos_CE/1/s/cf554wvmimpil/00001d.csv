@@ -1,0 +1,3 @@
+"0","primasvida_ts<-ts(primas_vida_$Primas_vida, start = c(2008,1), frequency = 4)"
+"0","primasnovida_ts<-ts(primas_novida_$Primas_no_vida, start = c(2008,1), frequency = 4)"
+"0","plot(primasvida_ts, xlab = ""Fecha"", ylab = ""Primas de vida"", main = ""Evolución"", col = ""red"")"

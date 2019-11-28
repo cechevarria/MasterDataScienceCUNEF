@@ -1,0 +1,211 @@
+<<<<<<< HEAD
+---
+title: "NBA2"
+author: "Carlota Echevarria"
+date: "17/10/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Librerias
+```{r}
+library(readr)
+library(rsample)
+library(glmnet) 
+library(dplyr)  
+library(ggplot2)
+library(nortest)
+library(MASS)
+library(fBasics)
+```
+Datos nba
+
+```{r}
+nba <- read_csv("C:/Users/echev/Desktop/CUNEF/PREDICCIÓN/nba.csv")
+View(nba)
+nba<-na.omit(nba)
+nba<-rename(nba,"Salario"="Salary","Partidos"="G", "Minutos"="MP", "EficienciaPER"="PER", "Acierto_Tiro"="TS%", "Intento_Triple"="3PAr", "Tiros_Libres"="FTr", "Rebotes_Of"="ORB%", "Rebotes_Def"="DRB%", "Total_Rebotes"="TRB%", "Asistencia"="AST%", "Robo"="STL%" , "Bloqueo"="BLK%", "Perdida_Balon"="TOV%", "Jugadasenequipo"="USG%","Victoria_Of"="OWS", "Victorias_Def"="DWS","Victorias"="WS","PtosOfensivosVSMedia"="OBPM", "PtosDefVSMedia"="DBPM", "PuntosVSMedia"="BPM", "JugadoresSimilares"="VORP")
+
+```
+Estadisticos principales
+
+```{r}
+summary(nba)
+
+
+```
+
+
+Creamos datos de aprendizaje y de test.
+```{r}
+set.seed(123)
+nba_split <- initial_split(nba, prop = .7, strata = "Salario")
+nba_train <- training(nba_split)
+nba_test  <- testing(nba_split)
+```
+
+Debido a la multicolinealidad, necesitamos encontrar el valor de lambda que minimice nuestro error. Eliminamos las variables: jugador, pais y equipo.
+```{r}
+nba_train_x <- model.matrix(Salario ~ .-Player-NBA_Country-Tm, nba_train)[, -1]
+nba_train_y <- (nba_train$Salario)
+
+nba_test_x <- model.matrix(Salario ~ .-Player-NBA_Country-Tm, nba_test)[, -1]
+nba_test_y <- (nba_test$Salario)
+
+dim(nba_train_x)
+```
+Eleccion del metodo para el calculo de λ. Hay 3 metodos posibles
+
+
+
+```{r}
+library(caret)
+
+train_control <- trainControl(method = "cv", number = 10)
+
+caret_mod <- train(
+  x = nba_train_x,
+  y = nba_train_y,
+  method = "glmnet",
+  preProc = c("center", "scale", "zv", "nzv"),
+  trControl = train_control,
+  tuneLength = 10
+)
+
+caret_mod
+
+```
+Obtenemos un lambda y alpha en el que el error es menor
+
+
+```{r}
+modelo_elasticnet<- glmnet(x = nba_train_x, y= nba_train_y, alpha=1, lambda=146358.4)
+coef(modelo_elasticnet)
+
+```
+
+
+```{r}
+cv_lasso   <- cv.glmnet(nba_train_x, nba_train_y, alpha = 1.0)
+min(cv_lasso$cvm)
+sqrt(min(cv_lasso$cvm))
+
+
+# prediccion
+pred <- predict(cv_lasso, s = cv_lasso$lambda.min, nba_test_x)
+mean((nba_test_y - pred)^2)
+sqrt(mean((nba_test_y - pred)^2))
+
+```
+Concluyendo con un error medio de 5783570, respecto a la practica 1, el error no ha mejorado.
+
+
+
+
+=======
+---
+title: "NBA2"
+author: "Carlota Echevarria"
+date: "17/10/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Librerias
+```{r}
+library(readr)
+library(rsample)
+library(glmnet) 
+library(dplyr)  
+library(ggplot2)
+library(nortest)
+library(MASS)
+library(fBasics)
+```
+Datos nba
+
+```{r}
+nba <- read_csv("C:/Users/echev/Desktop/CUNEF/PREDICCIÓN/nba.csv")
+View(nba)
+nba<-na.omit(nba)
+nba<-rename(nba,"Salario"="Salary","Partidos"="G", "Minutos"="MP", "EficienciaPER"="PER", "Acierto_Tiro"="TS%", "Intento_Triple"="3PAr", "Tiros_Libres"="FTr", "Rebotes_Of"="ORB%", "Rebotes_Def"="DRB%", "Total_Rebotes"="TRB%", "Asistencia"="AST%", "Robo"="STL%" , "Bloqueo"="BLK%", "Perdida_Balon"="TOV%", "Jugadasenequipo"="USG%","Victoria_Of"="OWS", "Victorias_Def"="DWS","Victorias"="WS","PtosOfensivosVSMedia"="OBPM", "PtosDefVSMedia"="DBPM", "PuntosVSMedia"="BPM", "JugadoresSimilares"="VORP")
+
+```
+Estadisticos principales
+
+```{r}
+summary(nba)
+
+
+```
+
+
+Creamos datos de aprendizaje y de test.
+```{r}
+set.seed(123)
+nba_split <- initial_split(nba, prop = .7, strata = "Salario")
+nba_train <- training(nba_split)
+nba_test  <- testing(nba_split)
+```
+
+Debido a la multicolinealidad, necesitamos encontrar el valor de lambda que minimice nuestro error. Eliminamos las variables: jugador, pais y equipo.
+```{r}
+nba_train_x <- model.matrix(Salario ~ .-Player-NBA_Country-Tm, nba_train)[, -1]
+nba_train_y <- (nba_train$Salario)
+
+nba_test_x <- model.matrix(Salario ~ .-Player-NBA_Country-Tm, nba_test)[, -1]
+nba_test_y <- (nba_test$Salario)
+
+dim(nba_train_x)
+```
+Eleccion del metodo para el calculo de λ. Hay 3 metodos posibles
+
+
+
+```{r}
+library(caret)
+
+train_control <- trainControl(method = "cv", number = 10)
+
+caret_mod <- train(
+  x = nba_train_x,
+  y = nba_train_y,
+  method = "glmnet",
+  preProc = c("center", "scale", "zv", "nzv"),
+  trControl = train_control,
+  tuneLength = 10
+)
+
+caret_mod
+
+```
+Obtenemos un lambda y alpha en el que el error es menor
+
+
+```{r}
+modelo_elasticnet<- glmnet(x = nba_train_x, y= nba_train_y, alpha=1, lambda=146358.4)
+coef(modelo_elasticnet)
+
+```
+
+
+```{r}
+cv_lasso   <- cv.glmnet(nba_train_x, nba_train_y, alpha = 1.0)
+min(cv_lasso$cvm)
+sqrt(min(cv_lasso$cvm))
+
+
+# prediccion
+pred <- predict(cv_lasso, s = cv_lasso$lambda.min, nba_test_x)
+mean((nba_test_y - pred)^2)
+sqrt(mean((nba_test_y - pred)^2))
+
+```
+Concluyendo con un error medio de 5783570, respecto a la practica 1, el error no ha mejorado.
+
+
+
+
+>>>>>>> 369dbefbb42f4aa2b3cc76fc7ac1c2fd42b8f7f5

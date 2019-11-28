@@ -1,0 +1,7 @@
+"0","#Librerias"
+"0","require(forecast)"
+"0","require(xts) #Tiene coredata e index (Instante de tiempo por fila)"
+"0","require(ggplot2)"
+"0","library(ggfortify) #Plot Monthplot"
+"0","library(dplyr)"
+"0",""

@@ -1,0 +1,3 @@
+"0","Primas_mapfre <- read.csv(""data/Primas_mapfre.csv"", header = TRUE,"
+"0","    sep = "";"", dec = "","" )"
+"0","View(Primas_mapfre)"

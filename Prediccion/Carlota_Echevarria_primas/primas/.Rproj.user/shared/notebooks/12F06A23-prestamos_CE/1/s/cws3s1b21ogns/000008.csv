@@ -1,0 +1,6 @@
+"0","cOmit = 4"
+"0","nObsVida = length(zPrimasVida)"
+"0","nObsNoVida = length(zPrimasNoVida)"
+"0",""
+"0","oVida <-window(zPrimasVida, start = index(zPrimasVida[1]), end = index(zPrimasVida[nObsVida - cOmit]))"
+"0","oNoVida <-window(zPrimasNoVida, start = index(zPrimasNoVida[1]), end = index(zPrimasNoVida[nObsNoVida - cOmit]))"

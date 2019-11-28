@@ -1,0 +1,7 @@
+"0","plot(fVidaEts)
+lines(window(zPrimasVida),type=""o"")
+lines(fVidaEts$mean,col=""red"")
+
+plot(fVidaNoEts)
+"
+"0","lines(window(zPrimasNoVida),type=""o"")"

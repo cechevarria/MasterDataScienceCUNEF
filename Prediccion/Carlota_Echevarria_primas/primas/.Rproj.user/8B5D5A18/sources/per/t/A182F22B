@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573578472715.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A182F22B",
+    "lastKnownWriteTime" : 27584981516943471,
+    "last_content_update" : 1573578472715,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "175B8CE2",
+        "caption" : "Primas_mapfre",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=Primas_mapfre&cache_key=175B8CE2",
+        "displayedObservations" : "40",
+        "environment" : "",
+        "expression" : "Primas_mapfre",
+        "object" : "Primas_mapfre",
+        "preview" : "0",
+        "totalObservations" : "40",
+        "variables" : "4"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

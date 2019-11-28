@@ -1,0 +1,3 @@
+"0","#Create a XTS object"
+"0","#Convert data to XTS"
+"0","xPrimas = xts(Primas_mapfre$Suma, order.by = as.Date(Primas_mapfre$Fecha,""%m/%d/%Y""),frequency=4)"

@@ -1,0 +1,4 @@
+"0","autoplot(colgate, col=""blue"") +"
+"0","  ggtitle(""Cuota de mercado Colgate"") +"
+"0","  xlab(""Semana"") +"
+"0","  ylab(""Cuota de mercado"") + theme_bw()"

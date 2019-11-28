@@ -1,0 +1,2 @@
+"0","primas_vida_<-select(Primas_mapfre,Fecha,Primas_vida)"
+"0","primas_novida_<-select(Primas_mapfre,Fecha,Primas_no_vida)"

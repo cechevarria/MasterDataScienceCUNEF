@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575888299458.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3386241220",
+    "id" : "4B92DC00",
+    "lastKnownWriteTime" : 1575897928,
+    "last_content_update" : 1575897928538,
+    "path" : "C:/Users/echev/Desktop/MasterDataScienceCUNEF/Prediccion/CarlotaEchevarria_VAR/VAR.Rmd",
+    "project_path" : "VAR.Rmd",
+    "properties" : {
+        "cursorPosition" : "49,38",
+        "scrollLine" : "34",
+        "tempName" : "Untitled2"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
